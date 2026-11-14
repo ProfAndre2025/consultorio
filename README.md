@@ -178,3 +178,4 @@ a disponibilidade e reconferida no servidor antes de gravar.
 
 **Uma folha de estilo, sem framework.** Visual claro tipo iOS, cartoes
 arredondados e um unico azul de destaque — legivel para quem esta aprendendo.
+# consultorio
