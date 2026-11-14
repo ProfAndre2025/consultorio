@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Pacientes</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Cadastros</span>
+            <h1>Pacientes</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/pacientes/novo}" class="botao">Novo paciente</a>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/pacientes}" class="busca">
+        <div class="campo">
+            <label for="termo">Buscar</label>
+            <input type="text" id="termo" name="termo" th:value="${termo}"
+                   placeholder="Nome ou CPF">
+        </div>
+        <label class="campo-caixa">
+            <input type="checkbox" name="mostrarInativos" value="true"
+                   th:checked="${mostrarInativos}"> Mostrar inativos
+        </label>
+        <button type="submit" class="botao secundario">Buscar</button>
+    </form>
+
+    <div th:if="${pagina.isEmpty()}" class="vazio">
+        <div class="vazio-titulo">Nenhum paciente por aqui</div>
+        <p>Cadastre o primeiro paciente para comecar a marcar consultas.</p>
+        <a th:href="@{/pacientes/novo}" class="botao">Novo paciente</a>
+    </div>
+
+    <div class="moldura-tabela" th:unless="${pagina.isEmpty()}">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th class="esconde-mobile">Telefone</th>
+                <th>Situacao</th>
+                <th class="acoes">Acoes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="paciente : ${pagina.content}">
+                <td class="principal-celula" th:text="${paciente.nome()}">Nome</td>
+                <td class="dado" th:text="${paciente.cpf()}">000</td>
+                <td class="dado esconde-mobile" th:text="${paciente.telefone() ?: '—'}">—</td>
+                <td>
+                    <span th:if="${paciente.ativo()}" class="selo ativo">Ativo</span>
+                    <span th:unless="${paciente.ativo()}" class="selo inativo">Inativo</span>
+                </td>
+                <td class="acoes">
+                    <a th:href="@{/pacientes/{id}/historico(id=${paciente.id()})}"
+                       class="botao secundario pequeno">Historico</a>
+                    <a th:href="@{/pacientes/{id}/editar(id=${paciente.id()})}"
+                       class="botao secundario pequeno">Editar</a>
+
+                    <!-- LGPD: ativo -> inativar; inativo -> reativar. -->
+                    <form th:if="${paciente.ativo()}" method="post"
+                          th:action="@{/pacientes/{id}/inativar(id=${paciente.id()})}"
+                          onsubmit="return confirm('Inativar este paciente? Os dados sao preservados.');">
+                        <button type="submit" class="botao perigo pequeno">Inativar</button>
+                    </form>
+                    <form th:unless="${paciente.ativo()}" method="post"
+                          th:action="@{/pacientes/{id}/reativar(id=${paciente.id()})}">
+                        <button type="submit" class="botao secundario pequeno">Reativar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragmentos/paginacao :: barra(${pagina}, '/pacientes', ${ {'termo': termo, 'mostrarInativos': mostrarInativos} })}"></div>
+
+</div>
+</body>
+</html>

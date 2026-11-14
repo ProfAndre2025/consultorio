@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Historico do paciente</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Pacientes &middot; Historico</span>
+            <h1 th:text="${paciente.nome()}">Paciente</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/pacientes}" class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <!-- Lista de atendimentos ja realizados, do mais recente ao mais antigo. -->
+    <div th:replace="~{fragmentos/historico :: linha(${historico})}"></div>
+
+</div>
+</body>
+</html>

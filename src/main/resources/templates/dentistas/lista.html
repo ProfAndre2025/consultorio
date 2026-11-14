@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Dentistas</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Cadastros</span>
+            <h1>Corpo clinico</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/dentistas/novo}" class="botao">Novo dentista</a>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/dentistas}" class="busca">
+        <div class="campo">
+            <label for="termo">Buscar</label>
+            <input type="text" id="termo" name="termo" th:value="${termo}"
+                   placeholder="Nome ou CRO">
+        </div>
+        <label class="campo-caixa">
+            <input type="checkbox" name="mostrarInativos" value="true"
+                   th:checked="${mostrarInativos}"> Mostrar inativos
+        </label>
+        <button type="submit" class="botao secundario">Buscar</button>
+    </form>
+
+    <div th:if="${pagina.isEmpty()}" class="vazio">
+        <div class="vazio-titulo">Nenhum dentista encontrado</div>
+        <p>Cadastre um profissional e defina os horarios em que ele atende.</p>
+        <a th:href="@{/dentistas/novo}" class="botao">Novo dentista</a>
+    </div>
+
+    <div class="moldura-tabela" th:unless="${pagina.isEmpty()}">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CRO</th>
+                <th class="esconde-mobile">Especialidade</th>
+                <th>Situacao</th>
+                <th class="acoes">Acoes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dentista : ${pagina.content}">
+                <td class="principal-celula" th:text="${dentista.nome()}">Nome</td>
+                <td class="dado" th:text="${dentista.cro()}">CRO</td>
+                <td class="esconde-mobile" th:text="${dentista.especialidade() ?: '—'}">—</td>
+                <td>
+                    <span th:if="${dentista.ativo()}" class="selo ativo">Ativo</span>
+                    <span th:unless="${dentista.ativo()}" class="selo inativo">Inativo</span>
+                </td>
+                <td class="acoes">
+                    <a th:href="@{/dentistas/{id}/agenda(id=${dentista.id()})}"
+                       class="botao secundario pequeno">Horarios</a>
+                    <a th:href="@{/dentistas/{id}/editar(id=${dentista.id()})}"
+                       class="botao secundario pequeno">Editar</a>
+                    <form th:if="${dentista.ativo()}" method="post"
+                          th:action="@{/dentistas/{id}/inativar(id=${dentista.id()})}"
+                          onsubmit="return confirm('Inativar este dentista? Os dados sao preservados.');">
+                        <button type="submit" class="botao perigo pequeno">Inativar</button>
+                    </form>
+                    <form th:unless="${dentista.ativo()}" method="post"
+                          th:action="@{/dentistas/{id}/reativar(id=${dentista.id()})}">
+                        <button type="submit" class="botao secundario pequeno">Reativar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragmentos/paginacao :: barra(${pagina}, '/dentistas', ${ {'termo': termo, 'mostrarInativos': mostrarInativos} })}"></div>
+
+</div>
+</body>
+</html>

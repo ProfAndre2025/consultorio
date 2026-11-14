@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Dentista</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Cadastros &middot; Corpo clinico</span>
+            <h1 th:text="${edicao} ? 'Editar dentista' : 'Novo dentista'">Dentista</h1>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <form method="post"
+              th:action="${edicao} ? @{/dentistas/{id}(id=${dentistaId})} : @{/dentistas}"
+              th:object="${dentista}">
+
+            <div class="campo">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" th:field="*{nome}"
+                       th:classappend="${#fields.hasErrors('nome')} ? 'invalido'">
+                <span class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="cro">CRO</label>
+                    <input type="text" id="cro" th:field="*{cro}" data-mascara="cro"
+                           placeholder="CRO-SP 00000"
+                           th:classappend="${#fields.hasErrors('cro')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('cro')}" th:errors="*{cro}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="especialidade">Especialidade</label>
+                    <input type="text" id="especialidade" th:field="*{especialidade}"
+                           placeholder="Clinica geral, ortodontia">
+                </div>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" th:field="*{telefone}" data-mascara="telefone"
+                           placeholder="(11) 90000-0000">
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" th:field="*{email}"
+                           th:classappend="${#fields.hasErrors('email')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label class="campo-caixa">
+                    <input type="checkbox" th:field="*{ativo}">
+                    Disponivel para agendamento
+                </label>
+            </div>
+
+            <h2 class="cartao-titulo" style="font-size:1rem; margin-top:22px;">Endereco</h2>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="cep">CEP</label>
+                    <input type="text" id="cep" th:field="*{cep}" data-mascara="cep" placeholder="00000-000">
+                </div>
+                <div class="campo" style="grid-column: span 2;">
+                    <label for="logradouro">Logradouro</label>
+                    <input type="text" id="logradouro" th:field="*{logradouro}"
+                           placeholder="Rua, avenida...">
+                </div>
+                <div class="campo">
+                    <label for="numero">Numero</label>
+                    <input type="text" id="numero" th:field="*{numero}" placeholder="000">
+                </div>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="complemento">Complemento</label>
+                    <input type="text" id="complemento" th:field="*{complemento}"
+                           placeholder="Apto, bloco, sala">
+                </div>
+                <div class="campo">
+                    <label for="bairro">Bairro</label>
+                    <input type="text" id="bairro" th:field="*{bairro}">
+                </div>
+                <div class="campo">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" th:field="*{cidade}">
+                </div>
+                <div class="campo">
+                    <label for="uf">UF</label>
+                    <input type="text" id="uf" th:field="*{uf}" maxlength="2"
+                           placeholder="SP" style="text-transform:uppercase;">
+                </div>
+            </div>
+
+            <div class="campo" style="max-width: 340px;">
+                <label for="senha">Senha de atendimento</label>
+                <input type="password" id="senha" th:field="*{senha}"
+                       autocomplete="new-password"
+                       th:placeholder="${edicao} ? 'Deixe em branco para manter a atual' : 'Minimo 4 caracteres'">
+                <span class="erro" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
+            </div>
+            <p class="cartao-nota" style="margin-top: 0;">
+                Esta senha e pedida ao dentista para iniciar um atendimento.
+                <span th:if="${edicao}">Em branco na edicao, a senha atual e mantida.</span>
+            </p>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Salvar dentista</button>
+                <a th:href="@{/dentistas}" class="botao secundario">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

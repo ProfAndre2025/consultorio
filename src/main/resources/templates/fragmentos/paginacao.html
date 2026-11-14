@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<!--
+  Fragmento de paginacao. Recebe:
+    pagina   -> objeto Page do Spring Data
+    urlBase  -> caminho para os links (ex.: '/pacientes')
+    params   -> mapa com os filtros atuais, para nao se perderem ao
+                trocar de pagina. Parametros nulos o Thymeleaf omite da URL.
+-->
+<div th:fragment="barra(pagina, urlBase, params)" class="paginacao"
+     th:if="${pagina.totalPages > 1}">
+
+    <a th:if="${!pagina.first}"
+       th:href="@{__${urlBase}__(pagina=${pagina.number - 1}, termo=${params.termo},
+                 status=${params.status}, inicio=${params.inicio}, fim=${params.fim},
+                 somenteAtivos=${params.somenteAtivos},
+                 mostrarInativos=${params.mostrarInativos})}">Anterior</a>
+    <span th:unless="${!pagina.first}" class="desabilitado">Anterior</span>
+
+    <span class="indice"
+          th:text="${(pagina.number + 1) + ' / ' + pagina.totalPages}">1 / 1</span>
+
+    <a th:if="${!pagina.last}"
+       th:href="@{__${urlBase}__(pagina=${pagina.number + 1}, termo=${params.termo},
+                 status=${params.status}, inicio=${params.inicio}, fim=${params.fim},
+                 somenteAtivos=${params.somenteAtivos},
+                 mostrarInativos=${params.mostrarInativos})}">Proxima</a>
+    <span th:unless="${!pagina.last}" class="desabilitado">Proxima</span>
+
+</div>
+</body>
+</html>

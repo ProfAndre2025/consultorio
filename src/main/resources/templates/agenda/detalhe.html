@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Consulta</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Atendimento &middot; Consulta</span>
+            <h1 th:text="${consulta.pacienteNome()}">Consulta</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/agenda}" class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <dl class="ficha">
+            <dt>Data e hora</dt>
+            <dd class="valor-dado"
+                th:text="${#temporals.format(consulta.dataHora(), 'dd/MM/yyyy HH:mm') + ' — ' + #temporals.format(consulta.dataHoraFim(), 'HH:mm')}">01/01</dd>
+
+            <dt>Paciente</dt>
+            <dd th:text="${consulta.pacienteNome()}">Paciente</dd>
+
+            <dt>CPF</dt>
+            <dd class="valor-dado" th:text="${consulta.pacienteCpf()}">000</dd>
+
+            <dt>Dentista</dt>
+            <dd th:text="${consulta.dentistaNome()}">Dentista</dd>
+
+            <dt>CRO</dt>
+            <dd class="valor-dado" th:text="${consulta.dentistaCro()}">CRO</dd>
+
+            <dt>Procedimento</dt>
+            <dd th:text="${consulta.procedimentoNome()}">Procedimento</dd>
+
+            <dt>Situacao</dt>
+            <dd>
+                <span th:switch="${consulta.status().name()}">
+                    <span th:case="'AGENDADA'" class="selo agendada" th:text="${consulta.situacao()}">Agendada</span>
+                    <span th:case="'REALIZADA'" class="selo realizada" th:text="${consulta.situacao()}">Realizada</span>
+                    <span th:case="'CANCELADA'" class="selo cancelada" th:text="${consulta.situacao()}">Cancelada</span>
+                </span>
+            </dd>
+
+            <dt th:if="${consulta.observacoes()}">Observacoes</dt>
+            <dd th:if="${consulta.observacoes()}" th:text="${consulta.observacoes()}">—</dd>
+
+            <dt th:if="${consulta.motivoCancelamento()}">Motivo</dt>
+            <dd th:if="${consulta.motivoCancelamento()}" th:text="${consulta.motivoCancelamento()}">—</dd>
+        </dl>
+
+        <div class="acoes-formulario">
+            <a th:if="${consulta.podeIniciarAtendimento()}"
+               th:href="@{/atendimentos/iniciar/{id}(id=${consulta.id()})}"
+               class="botao">Iniciar atendimento</a>
+            <a th:if="${consulta.atendimentoFinalizado()}"
+               th:href="@{/atendimentos/{id}(id=${consulta.atendimentoId()})}"
+               class="botao secundario">Ver atendimento</a>
+        </div>
+    </div>
+
+    <!-- Remarcacao: novo dia, novo horario e/ou outro dentista. -->
+    <div class="cartao" th:if="${consulta.status().name() == 'AGENDADA'}">
+        <h2 class="cartao-titulo">Remarcar consulta</h2>
+        <form method="post" th:action="@{/agenda/{id}/reagendar(id=${consulta.id()})}"
+              th:object="${reagendamento}">
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="data">Nova data</label>
+                    <input type="date" id="data" th:field="*{data}"
+                           th:classappend="${#fields.hasErrors('data')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('data')}" th:errors="*{data}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="hora">Novo horario</label>
+                    <input type="time" id="hora" th:field="*{hora}"
+                           th:classappend="${#fields.hasErrors('hora')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="dentistaId">Dentista</label>
+                    <select id="dentistaId" th:field="*{dentistaId}"
+                            th:classappend="${#fields.hasErrors('dentistaId')} ? 'invalido'">
+                        <option value="">Selecione</option>
+                        <option th:each="d : ${dentistas}"
+                                th:value="${d.id()}"
+                                th:text="${d.nome() + ' — ' + d.cro()}">Dentista</option>
+                    </select>
+                    <span class="erro" th:if="${#fields.hasErrors('dentistaId')}"
+                          th:errors="*{dentistaId}"></span>
+                </div>
+            </div>
+
+            <span class="erro" th:if="${#fields.hasErrors('dataHora')}" th:errors="*{dataHora}"></span>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Salvar remarcacao</button>
+            </div>
+        </form>
+        <p class="cartao-nota">
+            O procedimento e o paciente nao mudam aqui. Para troca-los, cancele
+            esta consulta e agende uma nova.
+        </p>
+    </div>
+
+    <!-- Cancelamento: so faz sentido enquanto a consulta esta AGENDADA. -->
+    <div class="cartao" th:if="${consulta.status().name() == 'AGENDADA'}">
+        <h2 class="cartao-titulo">Cancelar consulta</h2>
+        <form method="post" th:action="@{/agenda/{id}/cancelar(id=${consulta.id()})}"
+              th:object="${cancelamento}"
+              onsubmit="return confirm('Confirma o cancelamento desta consulta?');">
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="canceladaPor">Solicitado por</label>
+                    <select id="canceladaPor" th:field="*{canceladaPor}"
+                            th:classappend="${#fields.hasErrors('canceladaPor')} ? 'invalido'">
+                        <option value="">Selecione</option>
+                        <option th:each="origem : ${origensCancelamento}"
+                                th:value="${origem}" th:text="${origem.descricao}">Paciente</option>
+                    </select>
+                    <span class="erro" th:if="${#fields.hasErrors('canceladaPor')}"
+                          th:errors="*{canceladaPor}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="motivo">Motivo</label>
+                    <input type="text" id="motivo" th:field="*{motivo}"
+                           placeholder="Opcional">
+                </div>
+            </div>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao perigo">Cancelar consulta</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

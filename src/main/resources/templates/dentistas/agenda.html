@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Horarios de atendimento</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Corpo clinico &middot; Horarios</span>
+            <h1 th:text="${dentista.nome()}">Dentista</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/dentistas}" class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Faixas de atendimento</h2>
+
+        <div th:if="${dentista.disponibilidades().isEmpty()}" class="vazio vazio-compacto">
+            <p>Nenhuma faixa cadastrada. Defina abaixo os dias e horarios de atendimento
+               para que este profissional apareca na agenda.</p>
+        </div>
+
+        <div class="moldura-tabela" th:unless="${dentista.disponibilidades().isEmpty()}">
+            <table class="tabela">
+                <thead>
+                <tr>
+                    <th>Dia da semana</th>
+                    <th>Inicio</th>
+                    <th>Fim</th>
+                    <th class="acoes">Acao</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="faixa : ${dentista.disponibilidades()}">
+                    <td class="principal-celula" th:text="${faixa.diaSemanaDescricao()}">Segunda</td>
+                    <td class="dado" th:text="${#temporals.format(faixa.horaInicio(), 'HH:mm')}">08:00</td>
+                    <td class="dado" th:text="${#temporals.format(faixa.horaFim(), 'HH:mm')}">12:00</td>
+                    <td class="acoes">
+                        <form method="post"
+                              th:action="@{/dentistas/{id}/agenda/{faixaId}/excluir(id=${dentista.id()}, faixaId=${faixa.id()})}"
+                              onsubmit="return confirm('Remover este horario?');">
+                            <button type="submit" class="botao perigo pequeno">Remover</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Adicionar faixa</h2>
+        <form method="post" th:action="@{/dentistas/{id}/agenda(id=${dentista.id()})}"
+              th:object="${novaFaixa}">
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="diaSemana">Dia da semana</label>
+                    <select id="diaSemana" th:field="*{diaSemana}"
+                            th:classappend="${#fields.hasErrors('diaSemana')} ? 'invalido'">
+                        <option value="">Selecione</option>
+                        <option th:each="dia : ${diasDaSemana}"
+                                th:value="${dia.key}" th:text="${dia.value}">Segunda</option>
+                    </select>
+                    <span class="erro" th:if="${#fields.hasErrors('diaSemana')}" th:errors="*{diaSemana}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="horaInicio">Inicio</label>
+                    <input type="time" id="horaInicio" th:field="*{horaInicio}"
+                           th:classappend="${#fields.hasErrors('horaInicio')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('horaInicio')}" th:errors="*{horaInicio}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="horaFim">Fim</label>
+                    <input type="time" id="horaFim" th:field="*{horaFim}"
+                           th:classappend="${#fields.hasErrors('horaFim')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('horaFim')}" th:errors="*{horaFim}"></span>
+                </div>
+            </div>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Adicionar faixa</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

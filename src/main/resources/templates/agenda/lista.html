@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Agenda</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Atendimento</span>
+            <h1>Agenda</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/agenda/nova}" class="botao">Agendar consulta</a>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <form method="get" th:action="@{/agenda}">
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="inicio">De</label>
+                    <input type="date" id="inicio" name="inicio" th:value="${inicio}">
+                </div>
+                <div class="campo">
+                    <label for="fim">Ate</label>
+                    <input type="date" id="fim" name="fim" th:value="${fim}">
+                </div>
+                <div class="campo">
+                    <label for="status">Situacao</label>
+                    <select id="status" name="status">
+                        <option value="">Todas</option>
+                        <option th:each="s : ${statusPossiveis}"
+                                th:value="${s}" th:text="${s.descricao}"
+                                th:selected="${status == s}">Agendada</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="termo">Buscar</label>
+                    <input type="text" id="termo" name="termo" th:value="${termo}"
+                           placeholder="Paciente ou dentista">
+                </div>
+            </div>
+            <div class="acoes-formulario">
+                <button type="submit" class="botao secundario">Filtrar</button>
+                <a th:href="@{/agenda}" class="botao secundario">Limpar filtros</a>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${pagina.isEmpty()}" class="vazio">
+        <div class="vazio-titulo">Nenhuma consulta neste periodo</div>
+        <p>Ajuste os filtros ou marque uma nova consulta para a clinica.</p>
+        <a th:href="@{/agenda/nova}" class="botao">Agendar consulta</a>
+    </div>
+
+    <div class="moldura-tabela" th:unless="${pagina.isEmpty()}">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th>Data e hora</th>
+                <th>Paciente</th>
+                <th class="esconde-mobile">Dentista</th>
+                <th class="esconde-mobile">Procedimento</th>
+                <th>Situacao</th>
+                <th class="acoes">Acoes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="consulta : ${pagina.content}">
+                <td class="dado" th:text="${#temporals.format(consulta.dataHora(), 'dd/MM/yyyy HH:mm')}">01/01 08:00</td>
+                <td class="principal-celula" th:text="${consulta.pacienteNome()}">Paciente</td>
+                <td class="esconde-mobile" th:text="${consulta.dentistaNome()}">Dentista</td>
+                <td class="esconde-mobile" th:text="${consulta.procedimentoNome()}">Procedimento</td>
+                <td>
+                    <span th:switch="${consulta.status().name()}">
+                        <span th:case="'AGENDADA'" class="selo agendada" th:text="${consulta.situacao()}">Agendada</span>
+                        <span th:case="'REALIZADA'" class="selo realizada" th:text="${consulta.situacao()}">Realizada</span>
+                        <span th:case="'CANCELADA'" class="selo cancelada" th:text="${consulta.situacao()}">Cancelada</span>
+                    </span>
+                </td>
+                <td class="acoes">
+                    <a th:href="@{/agenda/{id}(id=${consulta.id()})}"
+                       class="botao secundario pequeno">Detalhes</a>
+
+                    <!-- Atender: leva a tela de senha antes de abrir o atendimento. -->
+                    <a th:if="${consulta.podeIniciarAtendimento()}"
+                       th:href="@{/atendimentos/iniciar/{id}(id=${consulta.id()})}"
+                       class="botao pequeno">Atender</a>
+
+                    <a th:if="${consulta.atendimentoFinalizado()}"
+                       th:href="@{/atendimentos/{id}(id=${consulta.atendimentoId()})}"
+                       class="botao secundario pequeno">Atendimento</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragmentos/paginacao :: barra(${pagina}, '/agenda', ${ {'termo': termo, 'status': status, 'inicio': inicio, 'fim': fim} })}"></div>
+
+</div>
+</body>
+</html>

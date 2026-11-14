@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Iniciar atendimento</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Atendimento</span>
+            <h1>Iniciar atendimento</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/agenda/{id}(id=${consulta.id()})}" class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <dl class="ficha">
+            <dt>Paciente</dt>
+            <dd th:text="${consulta.pacienteNome()}">Paciente</dd>
+            <dt>Dentista</dt>
+            <dd th:text="${consulta.dentistaNome()}">Dentista</dd>
+            <dt>Procedimento</dt>
+            <dd th:text="${consulta.procedimentoNome()}">Procedimento</dd>
+            <dt>Horario</dt>
+            <dd class="valor-dado"
+                th:text="${#temporals.format(consulta.dataHora(), 'dd/MM/yyyy HH:mm')}">01/01 08:00</dd>
+        </dl>
+    </div>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Senha do dentista</h2>
+        <p class="cartao-nota" style="margin-top: 0; margin-bottom: 18px;">
+            Para iniciar, o dentista responsavel confirma sua senha de atendimento.
+            E o "de acordo" do profissional que assina o procedimento.
+        </p>
+
+        <!--
+          Formulario enxuto: so a senha. O metodo POST vai para a MESMA rota
+          /atendimentos/iniciar/{id}; senha incorreta volta para esta tela
+          com a mensagem de erro (tratada no controller).
+        -->
+        <form method="post" th:action="@{/atendimentos/iniciar/{id}(id=${consulta.id()})}">
+            <div class="campo" style="max-width: 320px;">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" autofocus
+                       autocomplete="off" placeholder="Senha de atendimento">
+            </div>
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Confirmar e iniciar</button>
+                <a th:href="@{/agenda/{id}(id=${consulta.id()})}" class="botao secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

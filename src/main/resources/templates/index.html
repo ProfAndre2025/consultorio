@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Painel</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <h1 class="saudacao">Agenda de hoje</h1>
+    <p class="saudacao-apoio">
+        Consultas marcadas para hoje, em ordem de horario. Clique em uma delas
+        para remarcar, trocar o profissional ou cancelar.
+    </p>
+
+    <div th:if="${consultasDeHoje.isEmpty()}" class="vazio" style="margin-bottom: 30px;">
+        <div class="vazio-titulo">Nenhuma consulta para hoje</div>
+        <p>A agenda do dia esta livre. Marque uma consulta ou consulte outros periodos.</p>
+        <a th:href="@{/agenda/nova}" class="botao">Agendar consulta</a>
+    </div>
+
+    <div class="moldura-tabela" th:unless="${consultasDeHoje.isEmpty()}" style="margin-bottom: 30px;">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th>Horario</th>
+                <th>Paciente</th>
+                <th>Dentista</th>
+                <th class="esconde-mobile">Procedimento</th>
+                <th class="acoes">Acao</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- A linha inteira leva ao detalhe, onde se remarca ou cancela. -->
+            <tr th:each="consulta : ${consultasDeHoje}">
+                <td class="dado" th:text="${#temporals.format(consulta.dataHora(), 'HH:mm')}">08:00</td>
+                <td class="principal-celula" th:text="${consulta.pacienteNome()}">Paciente</td>
+                <td th:text="${consulta.dentistaNome()}">Dentista</td>
+                <td class="esconde-mobile" th:text="${consulta.procedimentoNome()}">Procedimento</td>
+                <td class="acoes">
+                    <a th:href="@{/agenda/{id}(id=${consulta.id()})}"
+                       class="botao secundario pequeno">Abrir</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="indicadores">
+        <a th:href="@{/agenda}" class="indicador">
+            <span class="indicador-rotulo">Agenda</span>
+            <div class="indicador-numero" th:text="${totalConsultas}">0</div>
+            <div class="indicador-apoio">consultas registradas</div>
+        </a>
+
+        <a th:href="@{/pacientes}" class="indicador">
+            <span class="indicador-rotulo">Pacientes</span>
+            <div class="indicador-numero" th:text="${totalPacientes}">0</div>
+            <div class="indicador-apoio">em acompanhamento</div>
+        </a>
+
+        <a th:href="@{/dentistas}" class="indicador">
+            <span class="indicador-rotulo">Dentistas</span>
+            <div class="indicador-numero" th:text="${totalDentistas}">0</div>
+            <div class="indicador-apoio">no corpo clinico</div>
+        </a>
+
+        <a th:href="@{/procedimentos}" class="indicador">
+            <span class="indicador-rotulo">Procedimentos</span>
+            <div class="indicador-numero" th:text="${totalProcedimentos}">0</div>
+            <div class="indicador-apoio">na tabela da clinica</div>
+        </a>
+    </div>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Como comecar</h2>
+        <!-- Aqui a ordem carrega informacao real: cada passo depende do anterior. -->
+        <ol class="trilha">
+            <li>
+                <div>
+                    <strong>Cadastre os dentistas</strong>
+                    <span>Informe os dias e horarios em que cada profissional atende.</span>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <strong>Monte a tabela de procedimentos</strong>
+                    <span>Defina honorarios, duracao e os materiais que cada um consome.</span>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <strong>Registre os pacientes</strong>
+                    <span>Dados de contato e observacoes que a equipe precisa saber.</span>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <strong>Use a agenda</strong>
+                    <span>Marque a consulta, realize o atendimento e emita o comprovante.</span>
+                </div>
+            </li>
+        </ol>
+    </div>
+
+</div>
+</body>
+</html>

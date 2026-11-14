@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Erro</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="pagina-erro">
+        <span class="codigo">Erro 500</span>
+        <h1>Algo saiu do previsto</h1>
+        <p th:text="${mensagem} ?: 'Ocorreu um erro inesperado ao processar a operacao.'">Erro.</p>
+        <a th:href="@{/}" class="botao">Voltar ao painel</a>
+    </div>
+</div>
+</body>
+</html>

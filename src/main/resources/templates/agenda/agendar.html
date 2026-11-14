@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Agendar consulta</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Atendimento &middot; Agenda</span>
+            <h1>Agendar consulta</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/agenda}" class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <!--
+      Passo 1: paciente + procedimento + data + hora.
+      O botao envia para /agenda/disponiveis, que reexibe esta MESMA tela
+      com a lista de profissionais livres no horario.
+    -->
+    <div class="cartao">
+        <h2 class="cartao-titulo">Dados da consulta</h2>
+        <form method="post" th:action="@{/agenda/disponiveis}" th:object="${agendamento}">
+
+            <div class="campo">
+                <label for="pacienteId">Paciente</label>
+                <select id="pacienteId" th:field="*{pacienteId}">
+                    <option value="">Selecione</option>
+                    <option th:each="p : ${pacientes}"
+                            th:value="${p.id()}"
+                            th:text="${p.nome() + ' — ' + p.cpf()}">Paciente</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="procedimentoId">Procedimento</label>
+                <select id="procedimentoId" th:field="*{procedimentoId}">
+                    <option value="">Selecione</option>
+                    <option th:each="proc : ${procedimentos}"
+                            th:value="${proc.id()}"
+                            th:text="${proc.rotulo()}">Procedimento</option>
+                </select>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="data">Data</label>
+                    <input type="date" id="data" th:field="*{data}">
+                </div>
+                <div class="campo">
+                    <label for="hora">Horario</label>
+                    <input type="time" id="hora" th:field="*{hora}">
+                </div>
+            </div>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Ver dentistas disponiveis</button>
+            </div>
+        </form>
+    </div>
+
+    <!--
+      Passo 2: so aparece depois da busca. Reaproveita os dados ja
+      preenchidos (campos ocultos) e apresenta quem esta livre.
+    -->
+    <div class="cartao" th:if="${buscaRealizada}">
+        <h2 class="cartao-titulo">Escolha o dentista</h2>
+
+        <div th:if="${disponiveis == null or disponiveis.isEmpty()}" class="vazio vazio-compacto">
+            <div class="vazio-titulo">Ninguem disponivel neste horario</div>
+            <p>Confira os horarios de atendimento cadastrados para o corpo clinico
+               ou experimente outra data.</p>
+        </div>
+
+        <form th:if="${disponiveis != null and !disponiveis.isEmpty()}"
+              method="post" th:action="@{/agenda}" th:object="${agendamento}">
+
+            <!-- Repassa os dados do passo 1 sem o usuario digitar de novo. -->
+            <input type="hidden" th:field="*{pacienteId}">
+            <input type="hidden" th:field="*{procedimentoId}">
+            <input type="hidden" th:field="*{data}">
+            <input type="hidden" th:field="*{hora}">
+
+            <div class="campo">
+                <label for="dentistaId">Dentista disponivel</label>
+                <select id="dentistaId" th:field="*{dentistaId}">
+                    <option value="">Selecione</option>
+                    <option th:each="d : ${disponiveis}"
+                            th:value="${d.id()}" th:text="${d.rotulo()}">Dentista</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="observacoes">Observacoes</label>
+                <textarea id="observacoes" th:field="*{observacoes}"
+                          placeholder="Anotacoes sobre a consulta"></textarea>
+            </div>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Confirmar agendamento</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

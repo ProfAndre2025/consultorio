@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Nao encontrado</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="pagina-erro">
+        <span class="codigo">Erro 404</span>
+        <h1>Registro nao encontrado</h1>
+        <p th:text="${mensagem} ?: 'O que voce procura nao existe ou ja foi removido.'">
+            Nao encontrado.
+        </p>
+        <a th:href="@{/}" class="botao">Voltar ao painel</a>
+    </div>
+</div>
+</body>
+</html>

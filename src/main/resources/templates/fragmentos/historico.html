@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<!--
+  Fragmento do historico clinico. Recebe 'itens' (lista de HistoricoItemView)
+  e desenha um cartao por atendimento realizado. Usado na ficha do paciente e
+  na tela de atendimento.
+-->
+<div th:fragment="linha(itens)">
+
+    <div th:if="${itens.isEmpty()}" class="vazio vazio-compacto">
+        <div class="vazio-titulo">Nenhum atendimento registrado</div>
+        <p>Quando um atendimento for finalizado, ele aparece aqui como historico.</p>
+    </div>
+
+    <div th:unless="${itens.isEmpty()}">
+        <div class="cartao" th:each="item : ${itens}" style="padding:18px 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;
+                        gap:12px; flex-wrap:wrap; margin-bottom:10px;">
+                <h2 style="font-family:'Fraunces',Georgia,serif; font-size:1.08rem; margin:0;"
+                    th:text="${item.procedimentoNome()}">Procedimento</h2>
+                <span class="dado" style="color:var(--tinta-suave);"
+                      th:text="${#temporals.format(item.realizadoEm(), 'dd/MM/yyyy HH:mm')}">
+                    01/01/2026 10:00</span>
+            </div>
+
+            <dl class="ficha">
+                <dt>Dentista</dt>
+                <dd>
+                    <span th:text="${item.dentistaNome()}">Dentista</span>
+                    <span class="dado" style="color:var(--tinta-suave);"
+                          th:text="' (' + ${item.dentistaCro()} + ')'"> (CRO)</span>
+                </dd>
+
+                <dt th:if="${item.temMateriais()}">Materiais</dt>
+                <dd th:if="${item.temMateriais()}">
+                    <span th:each="mat,it : ${item.materiais()}">
+                        <span th:text="${mat}">material</span><span th:unless="${it.last}">; </span>
+                    </span>
+                </dd>
+
+                <dt th:if="${item.temObservacoes()}">Observacoes</dt>
+                <dd th:if="${item.temObservacoes()}" th:text="${item.observacoes()}">—</dd>
+            </dl>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

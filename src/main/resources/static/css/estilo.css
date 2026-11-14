@@ -1,0 +1,671 @@
+/* ============================================================
+   Sistema de Consultorio Odontologico
+   Sistema visual "Porcelana e Petroleo"
+
+   TRES PAPEIS TIPOGRAFICOS, e cada um significa uma coisa:
+     Fraunces (serifada) ...... titulos e marca. Autoridade.
+     IBM Plex Sans ............ interface. Rotulos, botoes, textos.
+     IBM Plex Mono ............ DADO CLINICO. CPF, CRO, horarios,
+                                valores, identificadores.
+
+   A separacao nao e enfeite: ela ensina o olho a distinguir o que e
+   comando do sistema do que e registro do paciente.
+   ============================================================ */
+
+:root {
+    /*
+     * Paleta clara e pastel: leveza, limpeza e cuidado -- nao peso
+     * institucional. Os nomes das variaveis foram mantidos para nao
+     * quebrar as regras que ja as usam; so os VALORES mudaram.
+     */
+
+    /* Verdes: agora suaves, cor de agua e menta (nao mais petroleo escuro). */
+    --petroleo-900: #EAF4F1;   /* fundo da lateral: menta muito clara */
+    --petroleo-800: #357C6F;   /* acao primaria: teal (le bem com texto branco) */
+    --petroleo-700: #2C6A5F;   /* teal mais fechado (hover) */
+    --jade-600: #3E8E82;       /* links e textos de acento */
+    --jade-500: #5FB3A8;       /* foco (tom mais claro) */
+
+    /* Fundos e superficies: branco levemente quente. */
+    --porcelana: #F7F9F8;
+    --superficie: #FFFFFF;
+    --superficie-2: #F4F8F7;
+    --linha: #E6EEEC;
+    --linha-forte: #CFDDD9;
+
+    /* Texto: cinza-esverdeado escuro, nunca preto puro. */
+    --tinta: #2B3B38;
+    --tinta-media: #4F615D;
+    --tinta-suave: #82938F;
+
+    /* Acento suave (antigo latao), agora um dourado-champagne claro. */
+    --latao: #C6A15B;
+    --latao-claro: #F6EFE0;
+
+    /* Semanticas em tons pastel: presentes, mas sem gritar. */
+    --sucesso: #2F7658;
+    --sucesso-fundo: #E7F4EE;
+    --perigo: #A85248;
+    --perigo-fundo: #FBEEEC;
+
+    --raio: 10px;
+    --raio-sm: 6px;
+    --lateral-largura: 250px;
+
+    --sombra-sutil: 0 1px 2px rgba(79, 97, 93, 0.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--tinta);
+    background: var(--porcelana);
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--jade-600); text-decoration: none; }
+a:hover { color: var(--petroleo-700); text-decoration: underline; }
+
+h1, h2, h3 { margin: 0; font-weight: 600; }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--jade-500);
+    outline-offset: 2px;
+    border-radius: var(--raio-sm);
+}
+
+/* ============================================================
+   Estrutura: lateral fixa + area de trabalho
+   ============================================================ */
+.aplicacao { display: flex; min-height: 100vh; }
+
+.lateral {
+    width: var(--lateral-largura);
+    flex-shrink: 0;
+    background: var(--petroleo-900);      /* menta clara */
+    color: var(--tinta-media);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-right: 1px solid var(--linha);
+}
+
+.marca {
+    display: block;
+    padding: 26px 22px 22px;
+    color: var(--tinta);
+    border-bottom: 1px solid rgba(79, 97, 93, 0.10);
+}
+.marca:hover { text-decoration: none; color: var(--tinta); }
+
+.marca-nome {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.28rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+}
+
+/* O filete de acento sob a marca. */
+.marca-selo {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--jade-600);
+    margin-top: 4px;
+}
+
+.menu-lateral {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-titulo {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+    padding: 14px 10px 6px;
+}
+
+.menu-lateral a {
+    display: block;
+    padding: 9px 12px;
+    border-radius: var(--raio-sm);
+    color: var(--tinta-media);
+    font-size: 0.93rem;
+    font-weight: 500;
+    border-left: 2px solid transparent;
+}
+.menu-lateral a:hover {
+    background: rgba(95, 179, 168, 0.12);
+    color: var(--tinta);
+    text-decoration: none;
+}
+.menu-lateral a.ativo {
+    background: rgba(95, 179, 168, 0.18);
+    color: var(--jade-600);
+    border-left-color: var(--petroleo-800);
+}
+
+.lateral-rodape {
+    padding: 16px 22px 20px;
+    border-top: 1px solid rgba(79, 97, 93, 0.10);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    color: var(--tinta-suave);
+}
+
+.area-trabalho {
+    flex: 1;
+    min-width: 0;
+    padding: 34px 40px 64px;
+    max-width: 1180px;
+}
+
+/* ============================================================
+   Cabecalho de pagina: eyebrow em mono + titulo serifado
+   ============================================================ */
+.cabecalho-pagina {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--linha);
+    margin-bottom: 26px;
+}
+
+.eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+    display: block;
+    margin-bottom: 7px;
+}
+
+.cabecalho-pagina h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.85rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+}
+
+.cabecalho-acoes { display: flex; gap: 9px; flex-wrap: wrap; }
+
+/* ============================================================
+   Cartoes
+   ============================================================ */
+.cartao {
+    background: var(--superficie);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    box-shadow: var(--sombra-sutil);
+    padding: 22px 24px;
+    margin-bottom: 18px;
+}
+
+.cartao-titulo {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.12rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+}
+
+.cartao-nota { color: var(--tinta-suave); font-size: 0.88rem; margin: 12px 0 0; }
+
+/* ============================================================
+   Painel inicial
+   ============================================================ */
+.saudacao {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 2.1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+}
+.saudacao-apoio { color: var(--tinta-suave); font-size: 1rem; margin: 0 0 30px; max-width: 56ch; }
+
+.indicadores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.indicador {
+    background: var(--superficie);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    padding: 20px 22px;
+    color: var(--tinta);
+    display: block;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.indicador:hover {
+    text-decoration: none;
+    color: var(--tinta);
+    border-color: var(--linha-forte);
+    transform: translateY(-2px);
+}
+
+.indicador-rotulo {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+}
+
+/* Numerais em mono: sao dado, nao texto. */
+.indicador-numero {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 2.3rem;
+    font-weight: 500;
+    line-height: 1.1;
+    margin-top: 10px;
+    color: var(--jade-600);
+    font-variant-numeric: tabular-nums;
+}
+
+.indicador-apoio { font-size: 0.85rem; color: var(--tinta-suave); margin-top: 2px; }
+
+/* Trilha de primeiros passos: a ordem importa de verdade aqui,
+   por isso os numeros sao legitimos. */
+.trilha { list-style: none; margin: 0; padding: 0; counter-reset: etapa; }
+.trilha li {
+    counter-increment: etapa;
+    display: flex;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--linha);
+}
+.trilha li:last-child { border-bottom: none; padding-bottom: 0; }
+.trilha li::before {
+    content: counter(etapa, decimal-leading-zero);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--latao);
+    padding-top: 3px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+}
+.trilha strong { font-weight: 600; display: block; }
+.trilha span { color: var(--tinta-suave); font-size: 0.9rem; display: block; }
+
+/* ============================================================
+   Botoes
+   ============================================================ */
+.botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 17px;
+    border-radius: var(--raio-sm);
+    border: 1px solid transparent;
+    background: var(--petroleo-800);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+}
+.botao:hover { background: var(--petroleo-700); color: #FFFFFF; text-decoration: none; }
+
+.botao.secundario {
+    background: var(--superficie);
+    color: var(--tinta-media);
+    border-color: var(--linha-forte);
+}
+.botao.secundario:hover { background: var(--superficie-2); color: var(--tinta); }
+
+.botao.perigo { background: transparent; color: var(--perigo); border-color: #E3C9C7; }
+.botao.perigo:hover { background: var(--perigo-fundo); color: var(--perigo); }
+
+.botao.pequeno { padding: 5px 11px; font-size: 0.82rem; }
+
+/* ============================================================
+   Tabelas
+   ============================================================ */
+.moldura-tabela {
+    background: var(--superficie);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    overflow: hidden;
+    box-shadow: var(--sombra-sutil);
+}
+
+.tabela { width: 100%; border-collapse: collapse; }
+
+.tabela th {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+    font-weight: 500;
+    text-align: left;
+    padding: 13px 18px;
+    background: var(--superficie-2);
+    border-bottom: 1px solid var(--linha);
+    white-space: nowrap;
+}
+
+.tabela td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--linha);
+    vertical-align: middle;
+}
+.tabela tbody tr:last-child td { border-bottom: none; }
+.tabela tbody tr:hover td { background: var(--superficie-2); }
+
+/* Dado clinico em mono e alinhado por digito. */
+.dado {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--tinta-media);
+}
+.numerico {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
+.tabela th.numerico { text-align: right; }
+.principal-celula { font-weight: 500; }
+.acoes { text-align: right; white-space: nowrap; }
+.acoes form { display: inline; margin-left: 5px; }
+.acoes .botao + .botao { margin-left: 5px; }
+
+/* ============================================================
+   Selos de situacao
+   ============================================================ */
+.selo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.selo::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+.selo.agendada { background: #E4F1F7; color: #356F8A; }
+.selo.realizada { background: var(--sucesso-fundo); color: var(--sucesso); }
+.selo.cancelada { background: var(--perigo-fundo); color: var(--perigo); }
+.selo.ativo { background: var(--sucesso-fundo); color: var(--sucesso); }
+.selo.inativo { background: #EEF1F0; color: var(--tinta-suave); }
+.selo.previsto { background: #EEF1F0; color: var(--tinta-media); }
+.selo.adicional { background: #F3ECF7; color: #6E4A87; }
+
+/* ============================================================
+   Formularios
+   ============================================================ */
+.campo { margin-bottom: 17px; }
+
+.campo label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--tinta-media);
+    margin-bottom: 6px;
+}
+
+.campo input[type="text"],
+.campo input[type="email"],
+.campo input[type="date"],
+.campo input[type="time"],
+.campo input[type="number"],
+.campo select,
+.campo textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--linha-forte);
+    border-radius: var(--raio-sm);
+    background: var(--superficie);
+    color: var(--tinta);
+    font-family: inherit;
+    font-size: 0.93rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Campos que recebem DADO ganham a fonte mono. */
+.campo input[type="date"],
+.campo input[type="time"],
+.campo input[type="number"] {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    outline: none;
+    border-color: var(--jade-500);
+    box-shadow: 0 0 0 3px rgba(42, 127, 114, 0.13);
+}
+
+.campo textarea { resize: vertical; min-height: 84px; line-height: 1.55; }
+
+.campo .erro { display: block; color: var(--perigo); font-size: 0.8rem; margin-top: 5px; }
+.campo .invalido { border-color: var(--perigo); }
+.campo .invalido:focus { box-shadow: 0 0 0 3px rgba(158, 75, 69, 0.13); }
+
+.campo-caixa {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.9rem;
+    color: var(--tinta-media);
+    cursor: pointer;
+    font-weight: 400;
+}
+.campo-caixa input { width: auto; margin: 0; accent-color: var(--jade-600); }
+
+.linha-campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0 18px;
+}
+
+.acoes-formulario {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    padding-top: 18px;
+    border-top: 1px solid var(--linha);
+}
+
+/* ---------- Busca ---------- */
+.busca { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 18px; }
+.busca .campo { margin-bottom: 0; flex: 1; min-width: 190px; }
+.busca .campo-caixa { padding-bottom: 9px; }
+
+/* ============================================================
+   Mensagens
+   ============================================================ */
+.mensagem {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 13px 16px;
+    border-radius: var(--raio-sm);
+    margin-bottom: 20px;
+    font-size: 0.91rem;
+    border: 1px solid transparent;
+}
+.mensagem-marca {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    flex-shrink: 0;
+    line-height: 1.5;
+}
+.mensagem.sucesso { background: var(--sucesso-fundo); color: #1F5B41; border-color: #CBE3D6; }
+.mensagem.erro { background: var(--perigo-fundo); color: #7E3A35; border-color: #E8CFCD; }
+
+/* ============================================================
+   Fichas (lista de definicoes)
+   ============================================================ */
+.ficha { display: grid; grid-template-columns: 190px 1fr; gap: 0; margin: 0; }
+.ficha dt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+    padding: 11px 0;
+    border-bottom: 1px solid var(--linha);
+    display: flex;
+    align-items: center;
+}
+.ficha dd {
+    margin: 0;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--linha);
+    font-weight: 500;
+}
+.ficha dt:last-of-type, .ficha dd:last-of-type { border-bottom: none; }
+.valor-dado { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+
+/* Bloco de totais do atendimento */
+.totais { margin-left: auto; max-width: 360px; }
+.totais .ficha { grid-template-columns: 1fr auto; }
+.totais .ficha dt, .totais .ficha dd { padding: 9px 0; }
+.totais .ficha dd { text-align: right; font-family: "IBM Plex Mono", monospace; }
+.linha-total dt, .linha-total dd { border-bottom: none; }
+.linha-total dt { color: var(--tinta); letter-spacing: 0.12em; }
+.linha-total dd { font-size: 1.4rem; font-weight: 600; color: var(--jade-600); }
+
+/* ============================================================
+   Paginacao
+   ============================================================ */
+.paginacao { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-top: 18px; }
+.paginacao a, .paginacao span {
+    padding: 7px 13px;
+    border-radius: var(--raio-sm);
+    font-size: 0.85rem;
+    border: 1px solid var(--linha);
+    background: var(--superficie);
+    color: var(--tinta-media);
+}
+.paginacao a:hover { border-color: var(--linha-forte); text-decoration: none; }
+.paginacao .indice {
+    font-family: "IBM Plex Mono", monospace;
+    border-color: transparent;
+    background: transparent;
+    color: var(--tinta-suave);
+    font-size: 0.78rem;
+}
+.paginacao .desabilitado { color: var(--linha-forte); background: transparent; }
+
+/* ============================================================
+   Estado vazio: um convite a agir, nunca um lamento
+   ============================================================ */
+.vazio {
+    text-align: center;
+    padding: 56px 24px;
+    background: var(--superficie);
+    border: 1px dashed var(--linha-forte);
+    border-radius: var(--raio);
+}
+.vazio-titulo { font-family: "Fraunces", Georgia, serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+.vazio p { color: var(--tinta-suave); margin: 0 auto 16px; max-width: 44ch; font-size: 0.92rem; }
+.vazio-compacto { padding: 34px 20px; }
+
+/* ============================================================
+   Paginas de erro
+   ============================================================ */
+.pagina-erro { max-width: 500px; margin: 8vh auto; text-align: center; }
+.pagina-erro .codigo {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--latao);
+    text-transform: uppercase;
+}
+.pagina-erro h1 { font-family: "Fraunces", Georgia, serif; font-size: 1.9rem; margin: 12px 0 10px; letter-spacing: -0.015em; }
+.pagina-erro p { color: var(--tinta-suave); margin-bottom: 24px; }
+
+/* ============================================================
+   Responsivo
+   ============================================================ */
+@media (max-width: 900px) {
+    .aplicacao { flex-direction: column; }
+    .lateral {
+        width: 100%;
+        height: auto;
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        padding-right: 12px;
+    }
+    .marca { border-bottom: none; padding: 16px 18px; flex-shrink: 0; }
+    .menu-lateral { flex-direction: row; padding: 10px 0; gap: 4px; overflow-x: auto; }
+    .menu-lateral a { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+    .menu-lateral a.ativo { border-left: none; border-bottom-color: var(--latao); }
+    .menu-titulo, .lateral-rodape { display: none; }
+    .area-trabalho { padding: 24px 20px 48px; }
+}
+
+@media (max-width: 640px) {
+    .ficha { grid-template-columns: 1fr; }
+    .ficha dt { border-bottom: none; padding-bottom: 0; }
+    .ficha dd { padding-top: 2px; }
+    .esconde-mobile { display: none; }
+    .cabecalho-pagina h1 { font-size: 1.5rem; }
+    .saudacao { font-size: 1.65rem; }
+    .moldura-tabela { overflow-x: auto; }
+    .totais { max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

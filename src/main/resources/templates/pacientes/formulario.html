@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Paciente</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Cadastros &middot; Pacientes</span>
+            <h1 th:text="${edicao} ? 'Editar paciente' : 'Novo paciente'">Paciente</h1>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <!--
+          Uma acao para cada caso:
+            edicao=false -> POST /pacientes       (cadastrar)
+            edicao=true  -> POST /pacientes/{id}  (atualizar)
+        -->
+        <form method="post"
+              th:action="${edicao} ? @{/pacientes/{id}(id=${pacienteId})} : @{/pacientes}"
+              th:object="${paciente}">
+
+            <div class="campo">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" th:field="*{nome}"
+                       th:classappend="${#fields.hasErrors('nome')} ? 'invalido'">
+                <span class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpf" th:field="*{cpf}" data-mascara="cpf"
+                           placeholder="000.000.000-00"
+                           th:classappend="${#fields.hasErrors('cpf')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('cpf')}" th:errors="*{cpf}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="dataNascimento">Data de nascimento</label>
+                    <input type="date" id="dataNascimento" th:field="*{dataNascimento}"
+                           th:classappend="${#fields.hasErrors('dataNascimento')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('dataNascimento')}"
+                          th:errors="*{dataNascimento}"></span>
+                </div>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" th:field="*{telefone}" data-mascara="telefone"
+                           placeholder="(11) 90000-0000">
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" th:field="*{email}"
+                           th:classappend="${#fields.hasErrors('email')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="estadoCivil">Estado civil</label>
+                    <select id="estadoCivil" th:field="*{estadoCivil}">
+                        <option value="">Nao informado</option>
+                        <option value="Solteiro(a)">Solteiro(a)</option>
+                        <option value="Casado(a)">Casado(a)</option>
+                        <option value="Divorciado(a)">Divorciado(a)</option>
+                        <option value="Viuvo(a)">Viuvo(a)</option>
+                        <option value="Uniao estavel">Uniao estavel</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="genero">Genero</label>
+                    <select id="genero" th:field="*{genero}">
+                        <option value="">Nao informado</option>
+                        <option value="Homem cis">Homem cis</option>
+                        <option value="Mulher cis">Mulher cis</option>
+                        <option value="Homem trans">Homem trans</option>
+                        <option value="Mulher trans">Mulher trans</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2 class="cartao-titulo" style="font-size:1rem; margin-top:22px;">Endereco</h2>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="cep">CEP</label>
+                    <input type="text" id="cep" th:field="*{cep}" data-mascara="cep" placeholder="00000-000">
+                </div>
+                <div class="campo" style="grid-column: span 2;">
+                    <label for="logradouro">Logradouro</label>
+                    <input type="text" id="logradouro" th:field="*{logradouro}"
+                           placeholder="Rua, avenida...">
+                </div>
+                <div class="campo">
+                    <label for="numero">Numero</label>
+                    <input type="text" id="numero" th:field="*{numero}" placeholder="000">
+                </div>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="complemento">Complemento</label>
+                    <input type="text" id="complemento" th:field="*{complemento}"
+                           placeholder="Apto, bloco, sala">
+                </div>
+                <div class="campo">
+                    <label for="bairro">Bairro</label>
+                    <input type="text" id="bairro" th:field="*{bairro}">
+                </div>
+                <div class="campo">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" th:field="*{cidade}">
+                </div>
+                <div class="campo">
+                    <label for="uf">UF</label>
+                    <input type="text" id="uf" th:field="*{uf}" maxlength="2"
+                           placeholder="SP" style="text-transform:uppercase;">
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="observacoes">Observacoes</label>
+                <textarea id="observacoes" th:field="*{observacoes}"
+                          placeholder="Alergias, historico, preferencias de atendimento"></textarea>
+            </div>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Salvar paciente</button>
+                <a th:href="@{/pacientes}" class="botao secundario">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

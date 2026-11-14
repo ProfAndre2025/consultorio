@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--
+  LAYOUT base de todas as telas.
+
+  Cada pagina declara:
+    <html layout:decorate="~{fragmentos/layout}">
+  e preenche apenas o miolo (layout:fragment="conteudo").
+
+  Estrutura: barra lateral fixa em petroleo + area de trabalho clara.
+  A lateral escura da o peso de "sistema profissional" e libera a
+  largura da pagina para as tabelas de registros.
+-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Consultorio Odontologico</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="aplicacao">
+
+    <aside class="lateral">
+        <a th:href="@{/}" class="marca">
+            <span class="marca-nome">Consultorio</span>
+            <span class="marca-selo">Sistema clinico</span>
+        </a>
+
+        <nav class="menu-lateral">
+            <span class="menu-titulo">Atendimento</span>
+            <a th:href="@{/}"              th:classappend="${paginaAtiva == 'inicio'} ? 'ativo'">Painel</a>
+            <a th:href="@{/agenda}"        th:classappend="${paginaAtiva == 'agenda'} ? 'ativo'">Agenda</a>
+
+            <span class="menu-titulo">Cadastros</span>
+            <a th:href="@{/pacientes}"     th:classappend="${paginaAtiva == 'pacientes'} ? 'ativo'">Pacientes</a>
+            <a th:href="@{/dentistas}"     th:classappend="${paginaAtiva == 'dentistas'} ? 'ativo'">Dentistas</a>
+            <a th:href="@{/procedimentos}" th:classappend="${paginaAtiva == 'procedimentos'} ? 'ativo'">Procedimentos</a>
+            <a th:href="@{/produtos}"      th:classappend="${paginaAtiva == 'produtos'} ? 'ativo'">Materiais</a>
+        </nav>
+
+        <div class="lateral-rodape">SENAI &middot; Projeto didatico</div>
+    </aside>
+
+    <main class="area-trabalho">
+
+        <!-- Mensagens de sucesso e erro, vindas do flash apos um redirect. -->
+        <div class="mensagem sucesso" th:if="${mensagemSucesso}">
+            <span class="mensagem-marca">&check;</span>
+            <span th:text="${mensagemSucesso}">ok</span>
+        </div>
+        <div class="mensagem erro" th:if="${mensagemErro}">
+            <span class="mensagem-marca">!</span>
+            <span th:text="${mensagemErro}">erro</span>
+        </div>
+
+        <!-- Miolo especifico de cada pagina -->
+        <div layout:fragment="conteudo">
+            <p>Conteudo da pagina.</p>
+        </div>
+
+    </main>
+
+</div>
+
+<!-- Mascaras de digitacao (CPF, CEP, telefone, CRO). So aparencia; a
+     padronizacao real e feita no servidor. -->
+<script th:src="@{/js/mascaras.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Materiais</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Cadastros</span>
+            <h1>Materiais</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/produtos/novo}" class="botao">Novo material</a>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/produtos}" class="busca">
+        <div class="campo">
+            <label for="termo">Buscar</label>
+            <input type="text" id="termo" name="termo" th:value="${termo}"
+                   placeholder="Nome do material">
+        </div>
+        <label class="campo-caixa">
+            <input type="checkbox" name="mostrarInativos" value="true"
+                   th:checked="${mostrarInativos}"> Mostrar inativos
+        </label>
+        <button type="submit" class="botao secundario">Buscar</button>
+    </form>
+
+    <div th:if="${pagina.isEmpty()}" class="vazio">
+        <div class="vazio-titulo">Nenhum material cadastrado</div>
+        <p>Cadastre os insumos da clinica para vincula-los aos procedimentos.</p>
+        <a th:href="@{/produtos/novo}" class="botao">Novo material</a>
+    </div>
+
+    <div class="moldura-tabela" th:unless="${pagina.isEmpty()}">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th>Material</th>
+                <th>Unidade</th>
+                <th class="numerico">Preco unitario</th>
+                <th class="numerico">Em estoque</th>
+                <th>Situacao</th>
+                <th class="acoes">Acoes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="produto : ${pagina.content}">
+                <td class="principal-celula" th:text="${produto.nome()}">Nome</td>
+                <td class="dado" th:text="${produto.unidade()}">un</td>
+                <td class="numerico"
+                    th:text="${'R$ ' + #numbers.formatDecimal(produto.precoUnitario(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                <td class="numerico"
+                    th:text="${#numbers.formatDecimal(produto.estoque(), 1, 'POINT', 2, 'COMMA')}">0</td>
+                <td>
+                    <span th:if="${produto.ativo()}" class="selo ativo">Ativo</span>
+                    <span th:unless="${produto.ativo()}" class="selo inativo">Inativo</span>
+                </td>
+                <td class="acoes">
+                    <a th:href="@{/produtos/{id}/editar(id=${produto.id()})}"
+                       class="botao secundario pequeno">Editar</a>
+                    <form th:if="${produto.ativo()}" method="post"
+                          th:action="@{/produtos/{id}/inativar(id=${produto.id()})}"
+                          onsubmit="return confirm('Inativar este material? Os dados sao preservados.');">
+                        <button type="submit" class="botao perigo pequeno">Inativar</button>
+                    </form>
+                    <form th:unless="${produto.ativo()}" method="post"
+                          th:action="@{/produtos/{id}/reativar(id=${produto.id()})}">
+                        <button type="submit" class="botao secundario pequeno">Reativar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragmentos/paginacao :: barra(${pagina}, '/produtos', ${ {'termo': termo, 'mostrarInativos': mostrarInativos} })}"></div>
+
+</div>
+</body>
+</html>

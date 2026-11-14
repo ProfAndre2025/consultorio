@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Procedimentos</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Cadastros</span>
+            <h1>Tabela de procedimentos</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/procedimentos/novo}" class="botao">Novo procedimento</a>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/procedimentos}" class="busca">
+        <div class="campo">
+            <label for="termo">Buscar</label>
+            <input type="text" id="termo" name="termo" th:value="${termo}"
+                   placeholder="Nome do procedimento">
+        </div>
+        <label class="campo-caixa">
+            <input type="checkbox" name="mostrarInativos" value="true"
+                   th:checked="${mostrarInativos}"> Mostrar inativos
+        </label>
+        <button type="submit" class="botao secundario">Buscar</button>
+    </form>
+
+    <div th:if="${pagina.isEmpty()}" class="vazio">
+        <div class="vazio-titulo">Nenhum procedimento cadastrado</div>
+        <p>Defina os procedimentos da clinica com honorarios, duracao e materiais.</p>
+        <a th:href="@{/procedimentos/novo}" class="botao">Novo procedimento</a>
+    </div>
+
+    <div class="moldura-tabela" th:unless="${pagina.isEmpty()}">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th>Procedimento</th>
+                <th class="numerico">Honorarios</th>
+                <th class="numerico esconde-mobile">Duracao</th>
+                <th>Situacao</th>
+                <th class="acoes">Acoes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="proc : ${pagina.content}">
+                <td class="principal-celula" th:text="${proc.nome()}">Nome</td>
+                <td class="numerico"
+                    th:text="${'R$ ' + #numbers.formatDecimal(proc.precoMaoObra(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                <td class="numerico esconde-mobile"
+                    th:text="${proc.duracaoMinutos() + ' min'}">30 min</td>
+                <td>
+                    <span th:if="${proc.ativo()}" class="selo ativo">Ativo</span>
+                    <span th:unless="${proc.ativo()}" class="selo inativo">Inativo</span>
+                </td>
+                <td class="acoes">
+                    <a th:href="@{/procedimentos/{id}/materiais(id=${proc.id()})}"
+                       class="botao secundario pequeno">Materiais</a>
+                    <a th:href="@{/procedimentos/{id}/editar(id=${proc.id()})}"
+                       class="botao secundario pequeno">Editar</a>
+                    <form th:if="${proc.ativo()}" method="post"
+                          th:action="@{/procedimentos/{id}/inativar(id=${proc.id()})}"
+                          onsubmit="return confirm('Inativar este procedimento? Os dados sao preservados.');">
+                        <button type="submit" class="botao perigo pequeno">Inativar</button>
+                    </form>
+                    <form th:unless="${proc.ativo()}" method="post"
+                          th:action="@{/procedimentos/{id}/reativar(id=${proc.id()})}">
+                        <button type="submit" class="botao secundario pequeno">Reativar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragmentos/paginacao :: barra(${pagina}, '/procedimentos', ${ {'termo': termo, 'mostrarInativos': mostrarInativos} })}"></div>
+
+</div>
+</body>
+</html>

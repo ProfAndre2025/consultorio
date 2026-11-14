@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Atendimento</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Atendimento em curso</span>
+            <h1 th:text="${atendimento.pacienteNome()}">Atendimento</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:if="${atendimento.finalizado()}"
+               th:href="@{/atendimentos/{id}/receituario(id=${atendimento.id()})}"
+               class="botao secundario">Receituario</a>
+            <a th:if="${atendimento.finalizado()}"
+               th:href="@{/atendimentos/{id}/comprovante(id=${atendimento.id()})}"
+               class="botao" target="_blank">Comprovante em PDF</a>
+            <a th:href="@{/agenda/{id}(id=${atendimento.consultaId()})}"
+               class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <!-- Aviso quando ja finalizado: a tela vira somente leitura. -->
+    <div class="mensagem sucesso" th:if="${atendimento.finalizado()}">
+        <span class="mensagem-marca">&check;</span>
+        <span>Atendimento finalizado. O estoque foi baixado e o comprovante ja pode ser emitido.</span>
+    </div>
+
+    <div class="cartao">
+        <dl class="ficha">
+            <dt>Paciente</dt>
+            <dd th:text="${atendimento.pacienteNome()}">Paciente</dd>
+
+            <dt>CPF</dt>
+            <dd class="valor-dado" th:text="${atendimento.pacienteCpf()}">000</dd>
+
+            <dt>Dentista</dt>
+            <dd th:text="${atendimento.dentistaNome()}">Dentista</dd>
+
+            <dt>CRO</dt>
+            <dd class="valor-dado" th:text="${atendimento.dentistaCro()}">CRO</dd>
+
+            <dt>Procedimento</dt>
+            <dd th:text="${atendimento.procedimentoNome()}">Procedimento</dd>
+        </dl>
+    </div>
+
+    <!--
+      Historico clinico do paciente, recolhivel. O dentista abre no retorno
+      para ver o que ja foi feito, sem empurrar o atendimento atual para baixo.
+    -->
+    <details class="cartao" th:if="${!historico.isEmpty()}" style="padding:18px 20px;">
+        <summary style="cursor:pointer; font-family:'Fraunces',Georgia,serif;
+                        font-size:1.05rem; font-weight:600;">
+            Historico do paciente
+            <span class="dado" style="color:var(--tinta-suave); font-family:'IBM Plex Mono',monospace;"
+                  th:text="'(' + ${historico.size()} + ')'">(0)</span>
+        </summary>
+        <div style="margin-top:16px;">
+            <div th:replace="~{fragmentos/historico :: linha(${historico})}"></div>
+        </div>
+    </details>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Materiais utilizados</h2>
+
+        <div class="moldura-tabela" th:unless="${atendimento.materiais().isEmpty()}">
+            <table class="tabela">
+                <thead>
+                <tr>
+                    <th>Material</th>
+                    <th class="numerico">Quantidade</th>
+                    <th class="numerico esconde-mobile">Preco unitario</th>
+                    <th class="numerico">Subtotal</th>
+                    <th>Origem</th>
+                    <th class="acoes" th:unless="${atendimento.finalizado()}">Acao</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="material : ${atendimento.materiais()}">
+                    <td class="principal-celula" th:text="${material.nome()}">Material</td>
+                    <td class="numerico"
+                        th:text="${#numbers.formatDecimal(material.quantidade(), 1, 'POINT', 2, 'COMMA') + ' ' + material.unidade()}">1</td>
+                    <td class="numerico esconde-mobile"
+                        th:text="${'R$ ' + #numbers.formatDecimal(material.precoUnitario(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                    <td class="numerico"
+                        th:text="${'R$ ' + #numbers.formatDecimal(material.subtotal(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                    <td>
+                        <span class="selo" th:classappend="${material.extra()} ? 'adicional' : 'previsto'"
+                              th:text="${material.origem()}">Previsto</span>
+                    </td>
+                    <td class="acoes" th:unless="${atendimento.finalizado()}">
+                        <form method="post"
+                              th:action="@{/atendimentos/{id}/materiais/{materialId}/excluir(id=${atendimento.id()}, materialId=${material.id()})}">
+                            <button type="submit" class="botao perigo pequeno">Remover</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${atendimento.materiais().isEmpty()}" class="vazio vazio-compacto">
+            <p>Nenhum material registrado neste atendimento.</p>
+        </div>
+
+        <!-- Formulario de novo material: some depois de finalizar. -->
+        <form th:unless="${atendimento.finalizado()}"
+              method="post" th:action="@{/atendimentos/{id}/materiais(id=${atendimento.id()})}"
+              th:object="${novoUso}" style="margin-top: 20px;">
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="produtoId">Adicionar material</label>
+                    <select id="produtoId" th:field="*{produtoId}"
+                            th:classappend="${#fields.hasErrors('produtoId')} ? 'invalido'">
+                        <option value="">Selecione</option>
+                        <option th:each="p : ${produtos}"
+                                th:value="${p.id()}" th:text="${p.rotulo()}">Material</option>
+                    </select>
+                    <span class="erro" th:if="${#fields.hasErrors('produtoId')}" th:errors="*{produtoId}"></span>
+                </div>
+                <div class="campo">
+                    <label for="quantidade">Quantidade</label>
+                    <input type="number" step="0.01" min="0.01" id="quantidade"
+                           th:field="*{quantidade}"
+                           th:classappend="${#fields.hasErrors('quantidade')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('quantidade')}" th:errors="*{quantidade}"></span>
+                </div>
+            </div>
+            <div class="acoes-formulario">
+                <button type="submit" class="botao secundario">Adicionar material</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Totais -->
+    <div class="cartao">
+        <div class="totais">
+            <dl class="ficha">
+                <dt>Honorarios do dentista</dt>
+                <dd th:text="${'R$ ' + #numbers.formatDecimal(atendimento.precoMaoObra(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</dd>
+
+                <dt>Materiais</dt>
+                <dd th:text="${'R$ ' + #numbers.formatDecimal(atendimento.totalMateriais(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</dd>
+            </dl>
+            <dl class="ficha linha-total">
+                <dt>Total</dt>
+                <dd th:text="${'R$ ' + #numbers.formatDecimal(atendimento.valorTotal(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Finalizacao: baixa o estoque e trava o atendimento. -->
+    <div class="cartao" th:unless="${atendimento.finalizado()}">
+        <h2 class="cartao-titulo">Finalizar atendimento</h2>
+        <p class="cartao-nota" style="margin-top: 0; margin-bottom: 16px;">
+            Ao finalizar, o estoque dos materiais sera baixado e o atendimento nao
+            podera mais ser alterado. Se faltar estoque de algum item, nada e gravado.
+        </p>
+        <form method="post" th:action="@{/atendimentos/{id}/finalizar(id=${atendimento.id()})}"
+              th:object="${finalizacao}"
+              onsubmit="return confirm('Finalizar o atendimento? Esta acao nao pode ser desfeita.');">
+            <div class="campo">
+                <label for="observacoes">Observacoes clinicas</label>
+                <textarea id="observacoes" th:field="*{observacoes}"
+                          placeholder="Anotacoes sobre o procedimento realizado"></textarea>
+                <span class="erro" th:if="${#fields.hasErrors('observacoes')}" th:errors="*{observacoes}"></span>
+            </div>
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Finalizar atendimento</button>
+            </div>
+        </form>
+    </div>
+
+    <!--
+      Observacoes ja gravadas, quando finalizado.
+      Atencao: no operador "and" do SpEL os DOIS lados precisam ser booleanos.
+      Escrever "... and atendimento.observacoes()" quebra a tela (EL1001E).
+      Por isso o #strings.isEmpty, que cobre nulo e texto em branco.
+    -->
+    <div class="cartao"
+         th:if="${atendimento.finalizado() and !#strings.isEmpty(atendimento.observacoes())}">
+        <h2 class="cartao-titulo">Observacoes clinicas</h2>
+        <p style="margin: 0;" th:text="${atendimento.observacoes()}">—</p>
+    </div>
+
+</div>
+</body>
+</html>

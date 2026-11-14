@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Receituario</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Atendimento &middot; Receituario</span>
+            <h1 th:text="${atendimento.pacienteNome()}">Paciente</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/atendimentos/{id}(id=${atendimento.id()})}"
+               class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <dl class="ficha">
+            <dt>Paciente</dt>
+            <dd th:text="${atendimento.pacienteNome()}">Paciente</dd>
+            <dt>Dentista</dt>
+            <dd th:text="${atendimento.dentistaNome()}">Dentista</dd>
+            <dt th:if="${atendimento.dentistaEspecialidade()}">Especialidade</dt>
+            <dd th:if="${atendimento.dentistaEspecialidade()}"
+                th:text="${atendimento.dentistaEspecialidade()}">—</dd>
+        </dl>
+    </div>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Prescricao</h2>
+        <p class="cartao-nota" style="margin-top: 0; margin-bottom: 18px;">
+            Escreva a prescricao como deve sair no receituario. Cada linha e
+            preservada no PDF. O documento leva o cabecalho da clinica, os dados
+            do dentista e o espaco de assinatura.
+        </p>
+
+        <!--
+          O formulario envia direto para a rota que gera o PDF (POST). O
+          navegador abre o arquivo em nova aba (target="_blank"), sem sair
+          desta tela.
+        -->
+        <form method="post" target="_blank"
+              th:action="@{/atendimentos/{id}/receituario(id=${atendimento.id()})}">
+            <div class="campo">
+                <label for="prescricao">Texto da prescricao</label>
+                <textarea id="prescricao" name="prescricao" rows="10" required
+                          style="min-height: 220px;"
+                          placeholder="Ex.:&#10;1. Amoxicilina 500mg - 1 capsula de 8/8h por 7 dias&#10;2. Dipirona 1g - 1 comprimido de 6/6h se dor&#10;3. Bochecho com clorexidina 0,12% - 2x ao dia por 7 dias"></textarea>
+            </div>
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Gerar receituario em PDF</button>
+                <a th:href="@{/atendimentos/{id}(id=${atendimento.id()})}"
+                   class="botao secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

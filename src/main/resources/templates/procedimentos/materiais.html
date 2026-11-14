@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragmentos/layout}"
+      lang="pt-BR">
+<head>
+    <title>Materiais do procedimento</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+
+    <div class="cabecalho-pagina">
+        <div>
+            <span class="eyebrow">Procedimentos &middot; Materiais</span>
+            <h1 th:text="${procedimento.nome()}">Procedimento</h1>
+        </div>
+        <div class="cabecalho-acoes">
+            <a th:href="@{/procedimentos}" class="botao secundario">Voltar</a>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <dl class="ficha">
+            <dt>Honorarios</dt>
+            <dd class="valor-dado"
+                th:text="${'R$ ' + #numbers.formatDecimal(procedimento.precoMaoObra(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</dd>
+            <dt>Preco sugerido</dt>
+            <dd class="valor-dado"
+                th:text="${'R$ ' + #numbers.formatDecimal(procedimento.precoSugerido(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</dd>
+        </dl>
+        <p class="cartao-nota">
+            O preco sugerido soma os honorarios do dentista com os materiais abaixo. Serve como
+            referencia; o valor final e calculado no atendimento, com o que for realmente usado.
+        </p>
+    </div>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Materiais previstos</h2>
+
+        <div th:if="${procedimento.materiais().isEmpty()}" class="vazio vazio-compacto">
+            <p>Nenhum material vinculado. Adicione abaixo os insumos que este
+               procedimento costuma consumir.</p>
+        </div>
+
+        <div class="moldura-tabela" th:unless="${procedimento.materiais().isEmpty()}">
+            <table class="tabela">
+                <thead>
+                <tr>
+                    <th>Material</th>
+                    <th class="numerico">Quantidade</th>
+                    <th class="numerico esconde-mobile">Preco unitario</th>
+                    <th class="numerico">Subtotal</th>
+                    <th class="acoes">Acao</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="material : ${procedimento.materiais()}">
+                    <td class="principal-celula" th:text="${material.nome()}">Material</td>
+                    <td class="numerico"
+                        th:text="${#numbers.formatDecimal(material.quantidade(), 1, 'POINT', 2, 'COMMA') + ' ' + material.unidade()}">1</td>
+                    <td class="numerico esconde-mobile"
+                        th:text="${'R$ ' + #numbers.formatDecimal(material.precoUnitario(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                    <td class="numerico"
+                        th:text="${'R$ ' + #numbers.formatDecimal(material.subtotal(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                    <td class="acoes">
+                        <form method="post"
+                              th:action="@{/procedimentos/{id}/materiais/{vinculoId}/excluir(id=${procedimento.id()}, vinculoId=${material.id()})}"
+                              onsubmit="return confirm('Desvincular este material?');">
+                            <button type="submit" class="botao perigo pequeno">Remover</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="cartao">
+        <h2 class="cartao-titulo">Vincular material</h2>
+        <form method="post" th:action="@{/procedimentos/{id}/materiais(id=${procedimento.id()})}"
+              th:object="${novoMaterial}">
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="produtoId">Material</label>
+                    <select id="produtoId" th:field="*{produtoId}"
+                            th:classappend="${#fields.hasErrors('produtoId')} ? 'invalido'">
+                        <option value="">Selecione</option>
+                        <option th:each="p : ${produtos}"
+                                th:value="${p.id()}" th:text="${p.rotulo()}">Material</option>
+                    </select>
+                    <span class="erro" th:if="${#fields.hasErrors('produtoId')}" th:errors="*{produtoId}"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="quantidade">Quantidade</label>
+                    <input type="number" step="0.01" min="0.01" id="quantidade"
+                           th:field="*{quantidade}"
+                           th:classappend="${#fields.hasErrors('quantidade')} ? 'invalido'">
+                    <span class="erro" th:if="${#fields.hasErrors('quantidade')}" th:errors="*{quantidade}"></span>
+                </div>
+            </div>
+
+            <div class="acoes-formulario">
+                <button type="submit" class="botao">Vincular material</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>
